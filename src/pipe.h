@@ -5,5 +5,4 @@ typedef struct PIPE_DESCRIPTORS {
 } PIPE_DESCRIPTORS;
 
 int eli_pipe(lua_State *L);
-int pipe_create_meta(lua_State *L);
 int new_pipe(PIPE_DESCRIPTORS * descriptors);
