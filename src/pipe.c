@@ -68,11 +68,11 @@ static void new_eli_stream(lua_State *L, int fd, ELI_STREAM_KIND kind)
 {
     ELI_STREAM *p = (ELI_STREAM *)lua_newuserdata(L, sizeof(ELI_STREAM));
     switch (kind) {
-        case ELI_STREAM_READABLE_KIND: 
-            luaL_getmetatable(L, READABLE_STREAM_METATABLE);
+        case ELI_STREAM_R_KIND: 
+            luaL_getmetatable(L, ELI_STREAM_R_METATABLE);
             break;
-        case ELI_STREAM_WRITABLE_KIND: 
-            luaL_getmetatable(L, WRITABLE_STREAM_METATABLE);
+        case ELI_STREAM_W_KIND: 
+            luaL_getmetatable(L, ELI_STREAM_W_METATABLE);
             break;
         default:
     }
@@ -88,7 +88,7 @@ int eli_pipe(lua_State *L)
     PIPE_DESCRIPTORS descriptors;
     if (new_pipe(&descriptors) == -1)
         return push_error(L, NULL);
-    new_eli_stream(L, descriptors.fd[0], READABLE_STREAM_METATABLE);
-    new_eli_stream(L, descriptors.fd[1], WRITABLE_STREAM_METATABLE);
+    new_eli_stream(L, descriptors.fd[0], ELI_STREAM_R_METATABLE);
+    new_eli_stream(L, descriptors.fd[1], ELI_STREAM_W_METATABLE);
     return 2;
 }
