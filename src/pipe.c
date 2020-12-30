@@ -78,7 +78,7 @@ static void new_eli_stream(lua_State *L, int fd, ELI_STREAM_KIND kind)
             luaL_getmetatable(L, ELI_STREAM_RW_METATABLE);
             break;
         default:
-            luaL_error("Invalid ELI_STREAM_KIND");
+            luaL_error(L, "[new_eli_stream] Invalid ELI_STREAM_KIND!");
     }
     lua_setmetatable(L, -2);
     p->fd = fd;
