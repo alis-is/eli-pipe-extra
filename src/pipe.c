@@ -74,7 +74,11 @@ static void new_eli_stream(lua_State *L, int fd, ELI_STREAM_KIND kind)
         case ELI_STREAM_W_KIND: 
             luaL_getmetatable(L, ELI_STREAM_W_METATABLE);
             break;
+        case ELI_STREAM_RW_KIND:
+            luaL_getmetatable(L, ELI_STREAM_RW_METATABLE);
+            break;
         default:
+            luaL_error("Invalid ELI_STREAM_KIND");
     }
     lua_setmetatable(L, -2);
     p->fd = fd;
@@ -88,7 +92,7 @@ int eli_pipe(lua_State *L)
     PIPE_DESCRIPTORS descriptors;
     if (new_pipe(&descriptors) == -1)
         return push_error(L, NULL);
-    new_eli_stream(L, descriptors.fd[0], ELI_STREAM_R_METATABLE);
-    new_eli_stream(L, descriptors.fd[1], ELI_STREAM_W_METATABLE);
+    new_eli_stream(L, descriptors.fd[0], ELI_STREAM_R_KIND);
+    new_eli_stream(L, descriptors.fd[1], ELI_STREAM_W_KIND);
     return 2;
 }
