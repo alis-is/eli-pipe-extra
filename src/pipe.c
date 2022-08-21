@@ -32,8 +32,9 @@ static int closeonexec(int d)
 int new_pipe(PIPE_DESCRIPTORS * descriptors) {
     int fd[2];
 #ifdef _WIN32
+    HANDLE ph[2];
     int res = 0;
-    if (!CreatePipe(ph + 0, ph + 1, 0, 0))
+    if (!CreatePipe(ph, ph + 1, 0, 0))
         return -1;
     res = SetHandleInformation(ph[0], HANDLE_FLAG_INHERIT, 0);
     if (!res) {
