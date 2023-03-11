@@ -62,6 +62,7 @@ int new_pipe(PIPE_DESCRIPTORS * descriptors) {
 #endif
     descriptors->fd[0] = fd[0];
     descriptors->fd[1] = fd[1];
+    return 0;
 }
 
 
