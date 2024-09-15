@@ -31,31 +31,25 @@ static int closeonexec(int d)
 
 int new_pipe(PIPE_DESCRIPTORS *descriptors)
 {
-	int fd[2];
 #ifdef _WIN32
-	HANDLE ph[2];
+	HANDLE fd[2];
 	int res = 0;
-	if (!CreatePipe(ph, ph + 1, 0, 0))
+	if (!CreatePipe(fd, fd + 1, 0, 0))
 		return -1;
-	res = SetHandleInformation(ph[0], HANDLE_FLAG_INHERIT, 0);
+	res = SetHandleInformation(fd[0], HANDLE_FLAG_INHERIT, 0);
 	if (!res) {
+		CloseHandle(fd[0]);
+		CloseHandle(fd[1]);
 		return -1;
 	}
-	res = SetHandleInformation(ph[1], HANDLE_FLAG_INHERIT, 0);
+	res = SetHandleInformation(fd[1], HANDLE_FLAG_INHERIT, 0);
 	if (!res) {
-		return -1;
-	}
-
-	fd[0] = _open_osfhandle((intptr_t)ph[0], _O_RDONLY);
-	if (fd[0] == -1) {
-		return -1;
-	}
-	fd[1] = _open_osfhandle((intptr_t)ph[1], _O_WRONLY);
-	if (fd[1] == -1) {
-		close(fd[0]);
+		CloseHandle(fd[0]);
+		CloseHandle(fd[1]);
 		return -1;
 	}
 #else
+	int fd[2];
 	if (-1 == pipe(fd))
 		return -1;
 	closeonexec(fd[0]);
@@ -65,8 +59,11 @@ int new_pipe(PIPE_DESCRIPTORS *descriptors)
 	descriptors->fd[1] = fd[1];
 	return 0;
 }
-
+#ifdef _WIN32
+static void new_eli_stream(lua_State *L, HANDLE fd, ELI_STREAM_KIND kind)
+#else
 static void new_eli_stream(lua_State *L, int fd, ELI_STREAM_KIND kind)
+#endif
 {
 	ELI_STREAM *p = eli_new_stream(L);
 	switch (kind) {
