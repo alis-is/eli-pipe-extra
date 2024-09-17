@@ -1,6 +1,6 @@
 #include "lua.h"
 #include "lauxlib.h"
-#include "lutil.h"
+#include "lerror.h"
 #include "luaconf.h"
 #include "pipe.h"
 #include "stream.h"
