@@ -1,3 +1,7 @@
+#if defined(__linux__) && !defined(_GNU_SOURCE)
+#define _GNU_SOURCE
+#endif
+
 #include "lua.h"
 #include "lauxlib.h"
 #include "lerror.h"
@@ -19,7 +23,7 @@
 
 #include <errno.h>
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__linux__)
 static int closeonexec(int d)
 {
 	int fl = fcntl(d, F_GETFD);
@@ -50,10 +54,23 @@ int new_pipe(PIPE_DESCRIPTORS *descriptors)
 	}
 #else
 	int fd[2];
-	if (-1 == pipe(fd))
+	if (-1 ==
+#ifdef __linux__
+	    pipe2(fd, O_CLOEXEC)
+#else
+	    pipe(fd)
+#endif
+	)
 		return -1;
-	closeonexec(fd[0]);
-	closeonexec(fd[1]);
+#ifndef __linux__
+	if (closeonexec(fd[0]) == -1 || closeonexec(fd[1]) == -1) {
+		int error = errno;
+		close(fd[0]);
+		close(fd[1]);
+		errno = error;
+		return -1;
+	}
+#endif
 #endif
 	descriptors->fd[0] = fd[0];
 	descriptors->fd[1] = fd[1];
